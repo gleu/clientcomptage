@@ -43,8 +43,8 @@
  * Defines
  */
 #define CLIENTCOMPTAGE_VERSION "0.0.1"
-#define PGREPORT_DEFAULT_LINES 20
-#define PGREPORT_DEFAULT_STRING_SIZE 2048
+#define CLIENTCOMPTAGE_DEFAULT_LINES 20
+#define CLIENTCOMPTAGE_DEFAULT_STRING_SIZE 2048
 
 
 /*
@@ -54,6 +54,7 @@
 typedef enum
 {
   NONE = 0,
+  AJOUT,
   MOIS,
   SEMAINES
 } actions_t;
@@ -65,6 +66,7 @@ struct options
   char      *script;
   bool      verbose;
   actions_t action;
+  char      *heures;
 
   /* connection parameters */
   char      *dsn;
@@ -109,6 +111,7 @@ help(const char *progname)
        "Usage:\n"
        "  %s [OPTIONS]\n"
        "\nGeneral options:\n"
+       "  -a            ajout d'heures réalisées\n"
        "  -m|--mois     décompte par mois\n"
        "  -s|--semaines décompte par semaine\n"
        "  -v            verbose\n"
@@ -151,10 +154,14 @@ get_opts(int argc, char **argv)
   }
 
   /* get options */
-  while ((c = getopt(argc, argv, "msv")) != -1)
+  while ((c = getopt(argc, argv, "a:msv")) != -1)
   {
     switch (c)
     {
+      case 'a':
+        opts->action = AJOUT;
+        opts->heures = pg_strdup(optarg);
+        break;
       case 'm':
         opts->action = MOIS;
         break;
@@ -341,6 +348,7 @@ main(int argc, char **argv)
 {
   const char *progname;
   ConnParams cparams;
+  char       sql[CLIENTCOMPTAGE_DEFAULT_STRING_SIZE];
 
   /*
    * If the user stops the program,
@@ -364,6 +372,7 @@ main(int argc, char **argv)
   cparams.pghost = "localhost";
   cparams.pgport = "5414";
   cparams.dbname = "dalibo";
+  cparams.pguser = "postgres";
   cparams.prompt_password = TRI_DEFAULT;
   cparams.override_dbname = NULL;
 
@@ -372,6 +381,11 @@ main(int argc, char **argv)
 
   switch (opts->action)
   {
+    case AJOUT:
+      snprintf(sql, sizeof(sql),
+        "INSERT INTO public.comptage (deb,fin) VALUES (%s)", opts->heures);
+      execute(sql);
+      break;
     case MOIS:
       fetch_table("Mois", "SELECT * FROM public.mois");
       break;
