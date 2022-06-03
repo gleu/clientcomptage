@@ -54,6 +54,7 @@
 typedef enum
 {
   NONE = 0,
+  MOIS,
   SEMAINES
 } actions_t;
 
@@ -108,6 +109,7 @@ help(const char *progname)
        "Usage:\n"
        "  %s [OPTIONS]\n"
        "\nGeneral options:\n"
+       "  -m|--mois     décompte par mois\n"
        "  -s|--semaines décompte par semaine\n"
        "  -v            verbose\n"
        "  -?|--help     show this help, then exit\n"
@@ -149,10 +151,13 @@ get_opts(int argc, char **argv)
   }
 
   /* get options */
-  while ((c = getopt(argc, argv, "vs")) != -1)
+  while ((c = getopt(argc, argv, "msv")) != -1)
   {
     switch (c)
     {
+      case 'm':
+        opts->action = MOIS;
+        break;
       case 's':
         opts->action = SEMAINES;
         break;
@@ -367,6 +372,9 @@ main(int argc, char **argv)
 
   switch (opts->action)
   {
+    case MOIS:
+      fetch_table("Mois", "SELECT * FROM public.mois");
+      break;
     case SEMAINES:
       fetch_table("Semaines", "SELECT * FROM public.semaines");
       break;
