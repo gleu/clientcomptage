@@ -48,22 +48,29 @@
 
 
 /*
- * Structs
+ * Enums and structs
  */
+
+typedef enum
+{
+  NONE = 0,
+  SEMAINES
+} actions_t;
 
 /* these are the options structure for command line parameters */
 struct options
 {
   /* misc */
-  char *script;
-  bool verbose;
+  char      *script;
+  bool      verbose;
+  actions_t action;
 
   /* connection parameters */
-  char *dsn;
+  char      *dsn;
 
   /* version number */
-  int  major;
-  int  minor;
+  int       major;
+  int       minor;
 };
 
 
@@ -101,6 +108,7 @@ help(const char *progname)
        "Usage:\n"
        "  %s [OPTIONS]\n"
        "\nGeneral options:\n"
+       "  -s|--semaines décompte par semaine\n"
        "  -v            verbose\n"
        "  -?|--help     show this help, then exit\n"
        "  -V|--version  output version information, then exit\n"
@@ -141,10 +149,13 @@ get_opts(int argc, char **argv)
   }
 
   /* get options */
-  while ((c = getopt(argc, argv, "h:p:U:d:vs:")) != -1)
+  while ((c = getopt(argc, argv, "vs")) != -1)
   {
     switch (c)
     {
+      case 's':
+        opts->action = SEMAINES;
+        break;
       default:
         pg_log_error("Try \"%s --help\" for more information.\n", progname);
         exit(EXIT_FAILURE);
@@ -353,6 +364,15 @@ main(int argc, char **argv)
 
   /* Connect to the database */
   conn = connectDatabase(&cparams, progname, false, false, false);
+
+  switch (opts->action)
+  {
+    case SEMAINES:
+      fetch_table("Semaines", "SELECT * FROM public.semaines");
+      break;
+    default:
+      pg_log_error("No action defined");
+  }
 
   PQfinish(conn);
 
