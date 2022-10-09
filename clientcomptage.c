@@ -55,6 +55,7 @@ typedef enum
 {
   NONE = 0,
   AJOUT,
+  JOURS,
   MOIS,
   SEMAINES
 } actions_t;
@@ -112,6 +113,7 @@ help(const char *progname)
        "  %s [OPTIONS]\n"
        "\nGeneral options:\n"
        "  -a            ajout d'heures réalisées\n"
+       "  -j|--jour     décompte par jour\n"
        "  -m|--mois     décompte par mois\n"
        "  -s|--semaines décompte par semaine\n"
        "  -v            verbose\n"
@@ -154,13 +156,16 @@ get_opts(int argc, char **argv)
   }
 
   /* get options */
-  while ((c = getopt(argc, argv, "a:msv")) != -1)
+  while ((c = getopt(argc, argv, "a:jmsv")) != -1)
   {
     switch (c)
     {
       case 'a':
         opts->action = AJOUT;
         opts->heures = pg_strdup(optarg);
+        break;
+      case 'j':
+        opts->action = JOURS;
         break;
       case 'm':
         opts->action = MOIS;
@@ -385,6 +390,9 @@ main(int argc, char **argv)
       snprintf(sql, sizeof(sql),
         "INSERT INTO public.comptage (deb,fin) VALUES (%s)", opts->heures);
       execute(sql);
+      break;
+    case JOURS:
+      fetch_table("Jours", "SELECT * FROM public.jours_v");
       break;
     case MOIS:
       fetch_table("Mois", "SELECT * FROM public.mois");
