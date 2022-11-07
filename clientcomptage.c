@@ -375,7 +375,7 @@ main(int argc, char **argv)
 
   /* Set the connection struct */
   cparams.pghost = "localhost";
-  cparams.pgport = "5414";
+  cparams.pgport = "5415";
   cparams.dbname = "dalibo";
   cparams.pguser = "postgres";
   cparams.prompt_password = TRI_DEFAULT;
@@ -392,7 +392,7 @@ main(int argc, char **argv)
       execute(sql);
       break;
     case JOURS:
-      fetch_table("Jours", "SELECT * FROM public.jours_v LIMIT 10");
+      fetch_table("Jours", "SELECT * FROM public.jours ORDER BY jour DESC LIMIT 10");
       break;
     case MOIS:
       fetch_table("Mois", "SELECT * FROM public.mois");
