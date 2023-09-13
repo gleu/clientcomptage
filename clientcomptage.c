@@ -375,7 +375,7 @@ main(int argc, char **argv)
 
   /* Set the connection struct */
   cparams.pghost = "localhost";
-  cparams.pgport = "5415";
+  cparams.pgport = "5416";
   cparams.dbname = "dalibo";
   cparams.pguser = "postgres";
   cparams.prompt_password = TRI_DEFAULT;
