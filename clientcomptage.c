@@ -3,7 +3,7 @@
  *
  * This software is released under the PostgreSQL Licence.
  *
- * Guillaume Lelarge, guillaume@lelarge.info, 2022.
+ * Guillaume Lelarge, guillaume@lelarge.info, 2022-2024.
  */
 
 
